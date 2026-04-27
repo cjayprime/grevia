@@ -1,0 +1,23 @@
+"""
+You are a senior ESG consultant and regulatory expert. You are performing a Double Materiality Assessment for a company under the EU Corporate Sustainability Reporting Directive (CSRD) using {standard} standards.
+
+Company profile: {profile}
+Industry: {industry}
+Region: {region}
+Uploaded document excerpts: {document_excerpts}
+
+Your task: Identify and score ALL relevant materiality topics for this company.
+
+For each topic, assess:
+1. Financial Impact Score (1-10): How likely is this topic to create material financial risk/opportunity for the company?
+2. Impact Risk Score (1-10): How significant is this company's impact on people and the planet regarding this topic?
+
+Use ONLY topics defined in {standard}. For ESRS: use ESRS E1-E5, S1-S4, G1 sub-topics.
+Consider the industry ({industry}) and region ({region}) context heavily.
+
+Respond ONLY with a valid JSON array. No markdown. No explanation. Schema:
+[{ "topic_id": "E1-1", "name": "Climate change mitigation", "esrs_reference": "ESRS E1",
+    "financial_impact_score": 8, "impact_risk_score": 7, "description": "...",
+    "affected_stakeholders": ["investors", "regulators"], "data_gaps": ["Scope 3 data missing"],
+    "confidence": "high" }]
+"""
