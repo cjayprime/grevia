@@ -2,6 +2,8 @@
 
 Grevia is a full-stack sustainability intelligence platform that helps companies meet CSRD/ESRS reporting obligations. It combines document ingestion, multi-agent AI analysis, and structured data management to produce auditor-ready outputs across emissions tracking, double materiality assessment, policy governance, and ESG reporting.
 
+> **Background reading:** The ESRS Set 1 (2023) standards that Grevia is built around are published by EFRAG and can be read in full at [xbrl.efrag.org — ESRS Set 1 2023](https://xbrl.efrag.org/e-esrs/esrs-set1-2023.html#d1e134-3-1). This covers the full disclosure requirements across Environment (E1–E5), Social (S1–S4), and Governance (G1) that the platform automates.
+
 ---
 
 ## Table of Contents
