@@ -78,5 +78,5 @@ def build_esrs_graph():
 
 esrs_graph = build_esrs_graph()
 
-esrs_graph.get_graph().draw_mermaid_png(output_file_path="esrs_graph.png")
-print("ESRS Graph Visualization Saved As `esrs_graph.png`")
+# esrs_graph.get_graph().draw_mermaid_png(output_file_path="esrs_graph.png")
+# print("ESRS Graph Visualization Saved As `esrs_graph.png`")
