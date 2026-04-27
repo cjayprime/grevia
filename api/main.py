@@ -38,3 +38,16 @@ app.include_router(auth_router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+def run_migrations():
+    from alembic.config import Config
+    from alembic import command
+    # import os
+
+    # if os.getenv("RUN_MIGRATIONS") == "true":
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
+
+run_migrations()
