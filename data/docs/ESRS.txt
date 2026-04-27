@@ -1,2 +1,0 @@
-Contains ESRS AR 16
-https://xbrl.efrag.org/e-esrs/esrs-set1-2023.html#d1e134-3-1
