@@ -40,16 +40,16 @@ def health():
     return {"status": "ok"}
 
 
-def run_migrations():
-    from alembic.config import Config
-    from alembic import command
-    import os
+# def run_migrations():
+#     from alembic.config import Config
+#     from alembic import command
+#     import os
 
-    # if os.getenv("RUN_MIGRATIONS") == "true":
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    ini_path = os.path.join(current_dir, "..", "alembic.ini")
-    alembic_cfg = Config(ini_path)
-    command.upgrade(alembic_cfg, "head")
+#     # if os.getenv("RUN_MIGRATIONS") == "true":
+#     current_dir = os.path.dirname(os.path.abspath(__file__))
+#     ini_path = os.path.join(current_dir, "alembic.ini")
+#     alembic_cfg = Config(ini_path)
+#     command.upgrade(alembic_cfg, "head")
 
 
-run_migrations()
+# run_migrations()
