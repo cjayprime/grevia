@@ -241,7 +241,7 @@ def generate_hot_report(
             doc_names.append(doc.original_filename)
 
     if not doc_texts:
-        raise HTTPException(400, "No readable documents found for the given IDs")
+        raise HTTPException(400, "No readable documents found for the given documents")
 
     total_chars = sum(len(t) for t in doc_texts)
     if total_chars > 5000:
@@ -292,6 +292,7 @@ def generate_hot_report(
         file_size=len(html_content.encode("utf-8")),
         is_hot_report=True,
         report_prompts={"prompt": body.prompt},
+        chunks="[]",
         status=Status.READY,
     )
     session.add(record)
