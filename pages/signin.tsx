@@ -36,6 +36,7 @@ export default function SignIn() {
 
   return (
     <div className="auth-page">
+      <title>Sign In | Grevia</title>
       <div className="auth-bg-orbs">
         <div className="auth-orb auth-orb-1" />
         <div className="auth-orb auth-orb-2" />
