@@ -15,8 +15,8 @@ from models.materiality_assessment import MaterialityAssessment
 from models.materiality_assessment_breakdown import MaterialityAssessmentBreakdown
 from models.materiality_assessment_file import MaterialityAssessmentFile
 
-from agents.esrs.graph import esrs_graph, GraphState
-from agents.tools import get_document_chunks
+from my_agents.esrs.graph import esrs_graph, GraphState
+from my_agents.tools import get_document_chunks
 from schemas.materiality import (
     AssessmentRequest,
     Standard,
@@ -75,7 +75,7 @@ async def assess_materiality(
     }
 
     company_id = company.company_id
-    # TODO: agents should report the names of partner companies they find in the documents, and I
+    # TODO: my_agents should report the names of partner companies they find in the documents, and I
     # can verify against a known list of partners for the company.
     # company_name = company.name
 
@@ -92,7 +92,7 @@ async def assess_materiality(
     session.commit()
     session.refresh(materiality_assessment)
     materiality_assessment_id = materiality_assessment.materiality_assessment_id
-    
+
     new_materiality_assessment_files = []
     for hs_id in body.hot_store_ids:
         materiality_assessment_file = MaterialityAssessmentFile(
@@ -112,11 +112,15 @@ async def assess_materiality(
     initial_state: GraphState = {
         "input_validated": False,
         "messages": [],
+        "e_messages": [],
+        "s_messages": [],
+        "g_messages": [],
         "materiality_assessment_id": materiality_assessment_id,
         "hot_store_ids": body.hot_store_ids,
         "document_chunks": doc_chunks,
         "errors": [],
         "current_step": "validating",
+        "steps": {"validating": True},
         # "progress": progress
     }
     config = {"configurable": {"thread_id": materiality_assessment_id}}
@@ -124,7 +128,7 @@ async def assess_materiality(
     def _sse(event: str, data: dict) -> str:
         return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
-    async def event_stream():
+    async def astream():
         yield _sse(
             "step",
             {
@@ -135,6 +139,9 @@ async def assess_materiality(
 
         try:
             async for chunk in esrs_graph.astream(initial_state, config=config):
+                # print("progress.empty()")
+                # print(progress.empty())
+                # print("progress.empty()")
                 # while not progress.empty():
                 #     msg = progress.get_nowait()
                 #     yield _sse("substep", {"label": msg})
@@ -154,7 +161,7 @@ async def assess_materiality(
                         )
                         return
 
-                    step = node_state.get("current_step", node_name)
+                    step = node_name
                     label = STEP_LABELS.get(step, "")
                     if (
                         node_name == "fan_out"
@@ -178,7 +185,7 @@ async def assess_materiality(
                 if rec:
                     rec.status = AssessmentStatus.ERROR
                     s.commit()
-            # raise exc  # for testing only
+            raise exc  # for testing only
             yield _sse(
                 "error",
                 {
@@ -190,7 +197,7 @@ async def assess_materiality(
         yield _sse("success", {"materiality_assessment_id": materiality_assessment_id})
 
     return StreamingResponse(
-        event_stream(),
+        astream(),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

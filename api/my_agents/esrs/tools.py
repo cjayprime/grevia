@@ -1,11 +1,11 @@
 import os
+import json
 from pprint import pprint
 
 import serpapi
 from langchain_core.tools import tool
 
 
-# Web search
 @tool
 def web_search_tool(query: str) -> list[dict[str, str]]:
     """Searches the web using the Serper API."""
@@ -37,5 +37,5 @@ def web_search_tool(query: str) -> list[dict[str, str]]:
             }
             for r in results.get("organic_results", [])[:5]
         ]
-    except Exception:
-        return []
+    except Exception as exc:
+        return json.dumps({"error": str(exc)})

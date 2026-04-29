@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from agents import assistant_agent
+from my_agents import assistant_agent
 from models.database import get_session
 from rag.guardrails import input_guardrail, GuardrailError
 from schemas.assistant import ChatRequest, ChatResponse

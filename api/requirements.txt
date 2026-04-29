@@ -17,3 +17,11 @@ google-auth-httplib2
 google-auth-oauthlib
 msal
 alembic
+openai
+structlog
+
+# Testing
+pytest
+pytest-asyncio
+httpx
+anyio[trio]

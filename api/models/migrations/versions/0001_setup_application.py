@@ -217,7 +217,7 @@ def upgrade() -> None:
             "sub_topic",
             sa.Enum(
                 # Environmental (E)
-                *([f"E{i}" for i in range(1, 5)]),
+                *([f"E{i}" for i in range(1, 6)]),
                 # Social (S)
                 *([f"S{i}" for i in range(1, 5)]),
                 # Governance (G)
@@ -368,7 +368,7 @@ def upgrade() -> None:
         sa.Column("esrs_reference", sa.String(50), nullable=True),
         sa.Column(
             "mdr_type",
-            sa.Enum("MDR-P", "MDR-A"),
+            sa.Enum("MDR-P", "MDR-A", "MDR-T"),
             nullable=False,
             server_default="MDR-P",
         ),

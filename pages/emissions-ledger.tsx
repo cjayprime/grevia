@@ -512,7 +512,7 @@ export default function EmissionsLedger() {
         <div className="sec-head">
           <div className="sec-title">
             <span className="num">{timeline.length > 0 ? "02" : "01"}</span>
-            Emissions ledger
+            Emissions Ledger
           </div>
           <div className="sec-actions table-filters">
             {(["all", 1, 2, 3] as ScopeFilter[]).map((s) => (
@@ -680,8 +680,20 @@ export default function EmissionsLedger() {
                               : row.status === "ok"
                                 ? "● OK"
                                 : "● Unverified"}
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginLeft: 4, opacity: 0.6 }}>
-                            <path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <svg
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            style={{ marginLeft: 4, opacity: 0.6 }}
+                          >
+                            <path
+                              d="M1 5h8M5 1l4 4-4 4"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </button>
                       </td>

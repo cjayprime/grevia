@@ -36,7 +36,7 @@ class MaterialityAssessmentBreakdown(Base):
     sub_topic: Mapped[str] = mapped_column(
         sa.Enum(
             # Environmental (E)
-            *([f"E{i}" for i in range(1, 5)]),
+            *([f"E{i}" for i in range(1, 6)]),
             # Social (S)
             *([f"S{i}" for i in range(1, 5)]),
             # Governance (G)

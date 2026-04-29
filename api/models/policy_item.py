@@ -11,6 +11,7 @@ from .database import Base
 class MdrType(str, Enum):
     MDR_P = "MDR-P"
     MDR_A = "MDR-A"
+    MDR_T = "MDR-T"
 
 
 class KanbanColumn(str, Enum):

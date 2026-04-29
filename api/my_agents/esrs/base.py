@@ -1,5 +1,5 @@
 import json
-from typing import TypedDict, Annotated, List, Any
+from typing import TypedDict, Annotated, List, Any, Dict
 import operator
 
 from sqlalchemy.orm import Session
@@ -10,20 +10,32 @@ from models.workspace import Workspace
 from models.materiality_assessment import MaterialityAssessment
 
 # MODEL = "gpt-4.1"
-MODEL = "gpt-5.4" # For reasoning
+MODEL = "gpt-5.4"  # For reasoning
+
+
+def update_to_latest_results(previous: str | int, current: str | int) -> str | int:
+    return current
+
+
+def update_node_results(
+    previous: Dict[str, int], current: Dict[str, int]
+) -> Dict[str, int]:
+    return {**previous, **current}
 
 
 class GraphState(TypedDict):
-    input_validated: bool = False
-    is_fan_out: bool = False
     messages: Annotated[List[Any], add_messages]
+    e_messages: Annotated[List[Any], add_messages]
+    s_messages: Annotated[List[Any], add_messages]
+    g_messages: Annotated[List[Any], add_messages]
+    input_validated: Annotated[bool, operator.or_] = False
 
-    materiality_assessment_id: int
     hot_store_ids: Annotated[List[int], operator.add]
-    document_chunks: str
-
     errors: Annotated[List[str], operator.add]
-    current_step: str
+
+    document_chunks: Annotated[str, update_to_latest_results]
+    materiality_assessment_id: Annotated[int, update_to_latest_results]
+    steps: Annotated[Dict[str, int], update_node_results]
 
 
 def get_workspace_profile(workspace_id: int) -> dict:

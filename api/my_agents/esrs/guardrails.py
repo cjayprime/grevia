@@ -8,7 +8,8 @@ from rag.guardrails import (
     llm_judge,
     GuardrailError,
 )
-from .base import GraphState, build_context
+from schemas.materiality import AssessmentStatus
+from .base import GraphState, build_context, get_materiality_assessment
 
 
 def input_guardrail_agent(state: GraphState) -> GraphState:
@@ -55,7 +56,8 @@ def output_guardrail_agent(state: GraphState) -> GraphState:
     """
     errors = list(state.get("errors", []))
 
-    for msg in state.get("messages", []):
+    messages = [*state.get("e_messages", []), *state.get("s_messages", []), *state.get("g_messages", [])]
+    for msg in messages:
         content = msg.content if hasattr(msg, "content") else str(msg)
         if not content:
             continue
@@ -68,6 +70,21 @@ def output_guardrail_agent(state: GraphState) -> GraphState:
                 "Unable to continue the process at this time. Try again with different documents."
             )
 
+    pprint("\n\n\n===output_guardrail_agent")
+    pprint(state.get("current_step", ""))
+    # TODO: Check that all breakdowns were created
+    (materiality_assessment, session) = get_materiality_assessment(
+        state["materiality_assessment_id"]
+    )
+    materiality_assessment.status = AssessmentStatus.READY
+    try:
+        session.add(materiality_assessment)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
+
+    pprint("===============\n\n\n")
     return {
         **state,
         "errors": errors,

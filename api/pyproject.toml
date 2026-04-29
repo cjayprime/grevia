@@ -36,6 +36,7 @@ dependencies = [
     "langchain>=1.2.15",
     "langchain-openai>=1.2.1",
     "langsmith>=0.1.0",
+    "openai-agents>=0.14.6",
 ]
 
 [project.scripts]

@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, AIMessage
+from langchain_core.messages import SystemMessage, AIMessage, HumanMessage
 from trustcall import create_extractor
 
 from schemas.materiality import EnvironmentalAssessmentBreakdown, AssessmentStatus
@@ -57,8 +57,9 @@ Evidence rules:
 - Cover at minimum: E1-1 through E1-9, E2-1 through E2-5, E3-1 through E3-5, \
 E4-1 through E4-5, E5-1 through E5-5.
 - topic must be "Environment".
+- format: note that the first 2 characters of a disclosure requirement must be the same with the first 2 characters of a subtopic
 - sub_topic must match the DR prefix (e.g. "E1" for E1-1, "E3" for E3-2).
-- financial_materiality_score and impact_materiality_score are 0.00-99.99.
+- financial_materiality_score and impact_materiality_score are 0.00-99.99 (note the 2 decimal places for proper scoring).
 - description: quote evidence from the documents. If none exists, leave empty.
 - recommendations: required when description is blank, otherwise leave empty; reference the specific ESRS DR.
 - Do NOT fabricate metric_target values; only use figures (it could be cumulative) found in the documents.
@@ -76,30 +77,43 @@ def environment_agent(state: GraphState) -> GraphState:
     pprint(state.get("current_step", ""))
     pprint("===============\n\n\n")
 
-    #  q = state.get("progress_queue")
+    # q = state.get("progress")
     # if q:
-    #     q.put_nowait("Researching E1 Climate Change standards...")
-
-    is_from_tool_node = "environment" == state.get(
-        "current_step", ""
-    ) and not state.get("is_fan_out", False)
+    #     q.put_nowait("Researching environment Climate Change standards...")
 
     environment = ChatOpenAI(model=MODEL, temperature=0.1, logprobs=True)
     document_chunks = state.get("document_chunks", "")
     messages = [SystemMessage(SYSTEM.format(document_chunks=document_chunks))] + state[
-        "messages"
+        "e_messages"
     ]
+
+    steps = state.get("steps", {})
+    is_from_tool_node = steps.get("environment") is True
+
+    response = None
+    if not is_from_tool_node:
+        environment_tools = environment.bind_tools([web_search_tool])
+        response = environment_tools.invoke(messages)
+        if not hasattr(response, "tool_calls") or not response.tool_calls:
+            is_from_tool_node = True
+
     if is_from_tool_node:
         trustcall = create_extractor(
             llm=environment,
             tools=[EnvironmentalAssessmentBreakdown],
             enable_inserts=True,
         )
-        result = trustcall.invoke(messages)
+        extract_messages = messages + [
+            HumanMessage(
+                content="Please extract the Environment Assessment Breakdowns now. You must return the appropriate tool call for the extraction."
+            )
+        ]
+        result = trustcall.invoke(extract_messages)
+        if not result.get("responses"):
+            raise ValueError(
+                "No environment materiality assessment breakdowns found in the response."
+            )
         response = result["responses"][0]
-    else:
-        environment = environment.bind_tools([web_search_tool])
-        response = environment.invoke(messages)
 
     if is_from_tool_node:
         (materiality_assessment, session) = get_materiality_assessment(
@@ -151,11 +165,10 @@ def environment_agent(state: GraphState) -> GraphState:
 
     return {
         **state,
-        "is_fan_out": False,
-        "messages": [
+        "e_messages": [
             AIMessage(content="Succesfully completed for the environment report.")
             if is_from_tool_node
             else response
         ],
-        "current_step": "environment",
+        "steps": {"environment": True},
     }

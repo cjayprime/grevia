@@ -46,6 +46,7 @@ export default function DoubleMateriality() {
   const [assessment, setAssessment] = useState<MaterialityAssessment | null>(
     null,
   );
+  const [assessmentList, setAssessmentList] = useState<MaterialityAssessment[]>([]);
   const [breakdowns, setBreakdowns] = useState<MaterialityBreakdown[]>([]);
   const [assessing, setAssessing] = useState(false);
   const [loadingSteps, setLoadingSteps] = useState<string[]>([]);
@@ -91,15 +92,18 @@ export default function DoubleMateriality() {
           return;
         }
         const list = await res.json();
-        if (!cancelled && Array.isArray(list) && list.length > 0) {
-          const latest = list[0];
-          setAssessment(latest);
-          const detailRes = await authFetch(
-            `${API}/api/v1/materiality/${latest.materiality_assessment_id}`,
-          );
-          if (detailRes.ok) {
-            const detail = await detailRes.json();
-            if (!cancelled) setBreakdowns(detail.breakdowns || []);
+        if (!cancelled && Array.isArray(list)) {
+          setAssessmentList(list);
+          if (list.length > 0) {
+            const latest = list[0];
+            setAssessment(latest);
+            const detailRes = await authFetch(
+              `${API}/api/v1/materiality/${latest.materiality_assessment_id}`,
+            );
+            if (detailRes.ok) {
+              const detail = await detailRes.json();
+              if (!cancelled) setBreakdowns(detail.breakdowns || []);
+            }
           }
         }
       } catch {
@@ -491,7 +495,7 @@ export default function DoubleMateriality() {
 
         {breakdowns.length > 0 ? (
           <>
-            <DmsVizSection breakdowns={breakdowns} onExport={handleExport} />
+            <DmsVizSection breakdowns={breakdowns} />
 
             {assessment && (
               <div className="dm-view-more-wrap">
@@ -523,6 +527,61 @@ export default function DoubleMateriality() {
             hasStandard={!!standard}
           />
         )}
+
+        {/* {assessmentList.length > 0 && (
+          <section className="dm-reports-section">
+            <div className="dm-reports-header">
+              <h2 className="dm-reports-title">All Reports</h2>
+              <span className="dm-reports-count">{assessmentList.length}</span>
+            </div>
+            <div className="dm-history-list dm-reports-list">
+              {assessmentList.map((a, i) => (
+                <button
+                  key={a.materiality_assessment_id}
+                  type="button"
+                  className="dm-history-item"
+                  onClick={() =>
+                    router.push(`/double-materiality/${a.materiality_assessment_id}`)
+                  }
+                >
+                  <div className="dm-history-item-left">
+                    <span className="dm-history-item-num">
+                      #{assessmentList.length - i}
+                    </span>
+                    <div className="dm-history-item-info">
+                      <strong>
+                        {a.standard} Assessment
+                        {i === 0 && (
+                          <span className="dm-reports-latest-badge">Latest</span>
+                        )}
+                      </strong>
+                      <span>
+                        {[a.industry, a.region]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="dm-history-item-right">
+                    <span className="dm-history-item-date">
+                      {new Date(a.date).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <span
+                      className="dm-history-item-status"
+                      data-status={a.status}
+                    >
+                      {a.status}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )} */}
 
         {historyOpen && workspace && (
           <AssessmentHistory
